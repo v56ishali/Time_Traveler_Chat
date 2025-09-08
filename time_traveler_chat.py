@@ -1,11 +1,13 @@
 import streamlit as st
 from datetime import datetime, timedelta
-import time
 
 st.set_page_config(page_title="Time Traveler Chat", page_icon="⏳")
 
 st.title("⏳ Time Traveler Chat")
 st.write("Send a message that will be delivered at a future time (within a week).")
+
+# Auto-refresh every 1 second
+st_autorefresh = st.experimental_autorefresh(interval=1000, key="refresh")
 
 # Initialize session state
 if "scheduled" not in st.session_state:
@@ -17,12 +19,12 @@ if "date_str" not in st.session_state:
 if "time_str" not in st.session_state:
     st.session_state.time_str = (datetime.now() + timedelta(minutes=1)).strftime("%H:%M")
 
-# Input fields (stored in session state)
+# Inputs
 msg_text = st.text_area("Message:", "")
 st.session_state.date_str = st.text_input("Delivery Date (YYYY-MM-DD):", st.session_state.date_str)
 st.session_state.time_str = st.text_input("Delivery Time (HH:MM, 24hr):", st.session_state.time_str)
 
-# Schedule new message
+# Schedule
 if st.button("📩 Schedule Message"):
     try:
         delivery_dt = datetime.strptime(
@@ -38,7 +40,7 @@ if st.button("📩 Schedule Message"):
     except ValueError:
         st.error("❌ Invalid date or time format.")
 
-# Check & deliver messages (every run)
+# Check & deliver
 now = datetime.now()
 new_scheduled = []
 for msg in st.session_state.scheduled:
@@ -49,7 +51,7 @@ for msg in st.session_state.scheduled:
         new_scheduled.append(msg)
 st.session_state.scheduled = new_scheduled
 
-# Show delivered messages
+# Show delivered
 st.subheader("📨 Delivered Messages:")
 if st.session_state.delivered:
     for msg in st.session_state.delivered:
@@ -57,6 +59,3 @@ if st.session_state.delivered:
 else:
     st.info("No messages delivered yet.")
 
-# 🔄 Force refresh every 1 second
-time.sleep(1)
-st.experimental_rerun()

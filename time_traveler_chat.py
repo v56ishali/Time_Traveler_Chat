@@ -13,16 +13,22 @@ if "scheduled" not in st.session_state:
     st.session_state.scheduled = []  # stores scheduled messages
 if "delivered" not in st.session_state:
     st.session_state.delivered = []  # stores delivered messages
+if "date_str" not in st.session_state:
+    st.session_state.date_str = datetime.now().strftime("%Y-%m-%d")
+if "time_str" not in st.session_state:
+    st.session_state.time_str = (datetime.now() + timedelta(minutes=1)).strftime("%H:%M")
 
-# Input fields
-msg_text = st.text_area("Message:")
-date_str = st.text_input("Delivery Date (YYYY-MM-DD):", datetime.now().strftime("%Y-%m-%d"))
-time_str = st.text_input("Delivery Time (HH:MM, 24hr):", (datetime.now() + timedelta(minutes=1)).strftime("%H:%M"))
+# Input fields (persistent values)
+msg_text = st.text_area("Message:", "")
+st.session_state.date_str = st.text_input("Delivery Date (YYYY-MM-DD):", st.session_state.date_str)
+st.session_state.time_str = st.text_input("Delivery Time (HH:MM, 24hr):", st.session_state.time_str)
 
 # Schedule new message
 if st.button("📩 Schedule Message"):
     try:
-        delivery_dt = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
+        delivery_dt = datetime.strptime(
+            f"{st.session_state.date_str} {st.session_state.time_str}", "%Y-%m-%d %H:%M"
+        )
         now = datetime.now()
 
         if now < delivery_dt <= now + timedelta(days=7):

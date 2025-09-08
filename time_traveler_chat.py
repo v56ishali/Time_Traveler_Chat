@@ -20,12 +20,12 @@ if "date_str" not in st.session_state:
 if "time_str" not in st.session_state:
     st.session_state.time_str = (datetime.now() + timedelta(minutes=1)).strftime("%H:%M")
 
-# Inputs
+# User inputs
 msg_text = st.text_area("Message:", "")
 st.session_state.date_str = st.text_input("Delivery Date (YYYY-MM-DD):", st.session_state.date_str)
 st.session_state.time_str = st.text_input("Delivery Time (HH:MM, 24hr):", st.session_state.time_str)
 
-# Schedule
+# Schedule button
 if st.button("📩 Schedule Message"):
     try:
         delivery_dt = datetime.strptime(
@@ -39,9 +39,9 @@ if st.button("📩 Schedule Message"):
         else:
             st.error("❌ Please pick a future time within 7 days.")
     except ValueError:
-        st.error("❌ Invalid date or time format.")
+        st.error("❌ Invalid date or time format. Use YYYY-MM-DD and HH:MM (24hr).")
 
-# Check & deliver
+# Deliver messages
 now = datetime.now()
 new_scheduled = []
 for msg in st.session_state.scheduled:

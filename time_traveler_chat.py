@@ -41,11 +41,12 @@ if st.button("📩 Schedule Message"):
     except ValueError:
         st.error("❌ Invalid date or time format. Use YYYY-MM-DD and HH:MM (24hr).")
 
-# Deliver messages
-now = datetime.now()
+# Deliver messages (minute precision)
+now = datetime.now().replace(second=0, microsecond=0)  # ignore seconds
 new_scheduled = []
 for msg in st.session_state.scheduled:
-    if now >= msg["time"]:
+    delivery_time = msg["time"].replace(second=0, microsecond=0)
+    if now >= delivery_time:
         if msg not in st.session_state.delivered:
             st.session_state.delivered.append(msg)
     else:

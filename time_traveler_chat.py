@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_autorefresh import st_autorefresh
 from datetime import datetime, timedelta
 
 st.set_page_config(page_title="Time Traveler Chat", page_icon="⏳")
@@ -7,7 +8,7 @@ st.title("⏳ Time Traveler Chat")
 st.write("Send a message that will be delivered at a future time (within a week).")
 
 # Auto-refresh every 1 second
-st_autorefresh = st.experimental_autorefresh(interval=1000, key="refresh")
+st_autorefresh(interval=1000, key="refresh")
 
 # Initialize session state
 if "scheduled" not in st.session_state:

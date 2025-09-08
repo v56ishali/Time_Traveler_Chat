@@ -1,10 +1,12 @@
 import streamlit as st
 from datetime import datetime
-import time
 import json
 import os
 
 st.set_page_config(page_title="⏳ Time Traveler Chat", page_icon="⏳")
+
+# 🔄 Auto-refresh every 1 second
+st_autorefresh = st.experimental_autorefresh(interval=1000, key="refresh")
 
 # File to save scheduled messages
 DATA_FILE = "messages.json"
@@ -60,7 +62,7 @@ if st.button("📩 Schedule Message"):
         st.error(f"Invalid date/time format: {e}")
 
 # Deliver messages automatically
-delivered_now = deliver_messages(messages)
+deliver_messages(messages)
 
 # Show delivered messages
 st.subheader("📬 Delivered Messages:")

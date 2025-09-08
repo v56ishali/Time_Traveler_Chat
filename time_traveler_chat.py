@@ -8,32 +8,31 @@ st.set_page_config(page_title="⏳ Time Traveler Chat", page_icon="⏳")
 # 🔄 Auto-refresh every 1 second
 st_autorefresh = st.experimental_autorefresh(interval=1000, key="refresh")
 
-# File to save scheduled messages
 DATA_FILE = "messages.json"
 
-# Load messages from file
+# Load messages
 def load_messages():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r") as f:
             return json.load(f)
     return []
 
-# Save messages to file
+# Save messages
 def save_messages(messages):
     with open(DATA_FILE, "w") as f:
         json.dump(messages, f)
 
-# Deliver due messages
+# Deliver messages at exact time
 def deliver_messages(messages):
     now = datetime.now()
-    delivered = []
+    changed = False
     for msg in messages:
         delivery_time = datetime.fromisoformat(msg["time"])
         if not msg["delivered"] and now >= delivery_time:
             msg["delivered"] = True
-            delivered.append(f"{now.strftime('%Y-%m-%d %H:%M:%S')} → {msg['text']}")
-    save_messages(messages)
-    return delivered
+            changed = True
+    if changed:
+        save_messages(messages)
 
 # Load stored messages
 messages = load_messages()
@@ -41,10 +40,10 @@ messages = load_messages()
 st.title("⏳ Time Traveler Chat")
 st.write("Send a message that will be delivered at a future time (within a week).")
 
-# Input for new message
+# Input
 msg_text = st.text_area("Message:")
 date_input = st.text_input("Delivery Date (YYYY-MM-DD):", value=datetime.now().strftime("%Y-%m-%d"))
-time_input = st.text_input("Delivery Time (HH:MM in 24hr):", value=(datetime.now().strftime("%H:%M")))
+time_input = st.text_input("Delivery Time (HH:MM in 24hr):", value=datetime.now().strftime("%H:%M"))
 
 if st.button("📩 Schedule Message"):
     try:
@@ -61,10 +60,10 @@ if st.button("📩 Schedule Message"):
     except Exception as e:
         st.error(f"Invalid date/time format: {e}")
 
-# Deliver messages automatically
+# Deliver automatically
 deliver_messages(messages)
 
-# Show delivered messages
+# Show delivered
 st.subheader("📬 Delivered Messages:")
 for msg in messages:
     if msg["delivered"]:

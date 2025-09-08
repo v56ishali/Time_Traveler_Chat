@@ -1,24 +1,23 @@
 import streamlit as st
-from streamlit_autorefresh import st_autorefresh
 from datetime import datetime, timedelta
+import time
 
-# Auto refresh every 1 second
-st_autorefresh(interval=1000, key="refresh")
+st.set_page_config(page_title="Time Traveler Chat", page_icon="⏳")
 
 st.title("⏳ Time Traveler Chat")
 st.write("Send a message that will be delivered at a future time (within a week).")
 
 # Initialize session state
 if "scheduled" not in st.session_state:
-    st.session_state.scheduled = []  # stores scheduled messages
+    st.session_state.scheduled = []
 if "delivered" not in st.session_state:
-    st.session_state.delivered = []  # stores delivered messages
+    st.session_state.delivered = []
 if "date_str" not in st.session_state:
     st.session_state.date_str = datetime.now().strftime("%Y-%m-%d")
 if "time_str" not in st.session_state:
     st.session_state.time_str = (datetime.now() + timedelta(minutes=1)).strftime("%H:%M")
 
-# Input fields (persistent values)
+# Input fields (stored in session state)
 msg_text = st.text_area("Message:", "")
 st.session_state.date_str = st.text_input("Delivery Date (YYYY-MM-DD):", st.session_state.date_str)
 st.session_state.time_str = st.text_input("Delivery Time (HH:MM, 24hr):", st.session_state.time_str)
@@ -39,15 +38,15 @@ if st.button("📩 Schedule Message"):
     except ValueError:
         st.error("❌ Invalid date or time format.")
 
-# Deliver scheduled messages
+# Check & deliver messages (every run)
 now = datetime.now()
 new_scheduled = []
 for msg in st.session_state.scheduled:
     if now >= msg["time"]:
-        if msg not in st.session_state.delivered:  # deliver only once
+        if msg not in st.session_state.delivered:
             st.session_state.delivered.append(msg)
     else:
-        new_scheduled.append(msg)  # keep for future
+        new_scheduled.append(msg)
 st.session_state.scheduled = new_scheduled
 
 # Show delivered messages
@@ -57,3 +56,7 @@ if st.session_state.delivered:
         st.write(f"**{msg['time'].strftime('%Y-%m-%d %H:%M')}** → {msg['text']}")
 else:
     st.info("No messages delivered yet.")
+
+# 🔄 Force refresh every 1 second
+time.sleep(1)
+st.experimental_rerun()

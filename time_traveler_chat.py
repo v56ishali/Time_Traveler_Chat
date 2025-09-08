@@ -49,5 +49,5 @@ else:
     st.warning("No messages delivered yet.")
 
 # Auto-refresh every second
-st.experimental_set_query_params(dummy=str(datetime.now()))
+st.query_params(dummy=str(datetime.now()))
 
